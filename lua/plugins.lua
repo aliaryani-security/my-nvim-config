@@ -13,7 +13,32 @@ return require('lazy').setup({
 	{'nvim-telescope/telescope.nvim'},
 	requires = {'nvim-lua/plenary.nvim'},
 	-- Treesitter (syntax highlighting)
-	{'nvim-treesitter/nvim-treesitter', run = ':TSUpdate'},
+	{'nvim-treesitter/nvim-treesitter', branch = 'master', lazy = 'false', build = ":TSUpdate",
+        config = function()
+            require('nvim-treesitter.configs').setup({
+              ensure_installed = { "asm", "bash", "c", 'cmake', 'comment', 'cpp', 'desktop', 'diff', 'fish', 'gitignore', 'go', 'html', 'javascript', 'json', 'lua', 'markdown', 'markdown_inline', 'php', 'powershell', 'printf', 'python', 'regex', 'ruby', 'rust', "toml"},         -- نصب تمام زبان‌ها
+              highlight = {
+                enable = true,                  -- فعال‌سازی هایلایت کردن
+                additional_vim_regex_highlighting = true,
+              },
+              indent = {
+                enable = true,
+              },
+              -- اضافه کردن پیکربندی برای رنگی کردن کامنت‌ها
+              textobjects = {
+                select = {
+                  enable = true,
+                  lookahead = true,
+                  keymaps = {
+                    ['aa'] = '@comment.outer',   -- انتخاب کامنت‌ها
+                    ['ia'] = '@comment.inner',   -- انتخاب متن داخل کامنت
+                  },
+                },
+              },
+            })
+end
+    },
+    {'nvim-treesitter/nvim-treesitter-textobjects'},
 	-- Debug adapter protocol
 	{'mfussenegger/nvim-dap'},
     -- tree view on side
@@ -60,45 +85,30 @@ return require('lazy').setup({
     }
   end
 },
-    {
-       'Djancyp/better-comments.nvim',
-        requires = {'nvim-treesitter/nvim-treesitter'},
-        config = function()
-            require('better-comment').Setup({
-                tags = {
-                        {
-                            name = "TODO",
-                            fg = "white",
-                            bg = "#0a7aca",
-                            bold = true,
-                            virtual_text = "",
-                        },
-                        {
-                            name = "FIX",
-                            fg = "white",
-                            bg = "#f44747",
-                            bold = true,
-                            --virtual_text = "This is virtual Text from FIX",
-                        },
-                        {
-                            name = "WARNING",
-                            fg = "#FFA500",
-                            bg = "",
-                            bold = false,
-                            --virtual_text = "This is virtual Text from WARNING",
-                        },
-                        {
-                            name = "!",
-                            fg = "#f44747",
-                            bg = "",
-                            bold = true,
-                            --virtual_text = "",
-                        }
-
-                    }
-                })
+    {'numToStr/Comment.nvim'
+        , config = function()
+            require('Comment').setup({
+          ignore = nil,                -- کامنت‌های خاص که نمی‌خواهید تغییر کنند
+          mappings = {
+            basic = true,              -- کلیدهای پیش‌فرض برای کامنت‌گذاری
+            extra = true,              -- اضافه کردن کلیدهای اضافی مثل Visual mode
+          },
+          pre_hook = function(ctx)
+            -- اینجا می‌تونی یک hook اضافه کنی تا مثلا رنگ خاصی برای کامنت‌ها داشته باشی
+            local U = require('Comment.utils')
+            if ctx.ctype == U.ctype.line then
+              return '-- '  -- برای کامنت‌های خطی
+            elseif ctx.ctype == U.ctype.block then
+              return '/* '  -- برای کامنت‌های بلوک
             end
+          end,
+          post_hook = function(ctx)
+            -- اینجا هم می‌تونی hook اضافه کنی
+          end,
+        })
+end
     },
+    
     {
       'mrcjkb/rustaceanvim',
        version = '^6', -- Recommended
