@@ -7,6 +7,7 @@ vim.lsp.enable('clangd')
 vim.lsp.enable('pylsp')
 
 vim.lsp.enable('nasm')
+
 -- Auto completion
 local cmp = require'cmp'
 cmp.setup({
